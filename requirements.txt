@@ -1,0 +1,6 @@
+# CipherPixel runtime dependencies (tested with the versions noted in README.md)
+cryptography>=42.0,<60      # AES-256-GCM, PBKDF2-HMAC-SHA256
+argon2-cffi>=23.1,<30       # Argon2id key derivation (PBKDF2 fallback is used if missing)
+Pillow>=10.3,<14            # image validation and metadata
+PySide6>=6.6,<7             # Qt for Python GUI
+qtawesome>=1.3,<2           # icon set
