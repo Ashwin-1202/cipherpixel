@@ -176,4 +176,5 @@ Mutating the code (constant salt, nonce reuse, dropped AAD, no FINAL flag) makes
 
 Regenerate screenshots: `python tools/make_screenshots.py`
 #   c i p h e r p i x e l  
+ #   c i p h e r p i x e l  
  
