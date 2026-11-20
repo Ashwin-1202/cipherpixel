@@ -1,182 +1,376 @@
-# CipherPixel – Advanced Image Security System
+# 🔐 CipherPixel – Advanced Image Security System
 
-Desktop application that encrypts images into authenticated `.cpx` files and restores them
-**byte-for-byte**, using standard cryptography (AES-256-GCM + Argon2id/PBKDF2) behind a modern
-PySide6 interface. Everything runs locally; there is no network code.
+**Secure your images. Preserve every byte.**
 
-![Overview](docs/screenshots/01-overview.png)
+CipherPixel is a desktop-based image encryption and decryption application built with **Python and PySide6**. It encrypts images into authenticated `.cpx` files and restores them **byte-for-byte** using industry-standard cryptographic algorithms.
 
-| Encrypt | Decrypt |
-|---|---|
-| ![Encrypt](docs/screenshots/03-encrypt-ready.png) | ![Decrypt](docs/screenshots/07-decrypt-success.png) |
+Powered by **AES-256-GCM, Argon2id, and PBKDF2-HMAC-SHA256**, CipherPixel provides strong encryption, integrity verification, and secure local processing.
 
-More screenshots are in [`docs/screenshots/`](docs/screenshots): wrong-password error, history, security
-center, settings, light theme and the compact (narrow window) layout.
+- 🔒 Advanced image encryption
+- 🛡️ Authentication and tamper detection
+- 🔑 Password-based key derivation
+- 🖥️ Modern PySide6 desktop interface
+- 💻 Fully offline – no network communication
+
+---
+## ✨ Key Features
+
+### 🔐 Advanced Encryption
+- AES-256-GCM authenticated encryption.
+- Argon2id and PBKDF2-HMAC-SHA256 key derivation.
+- Random salt and nonce generation.
+- Chunk-based encryption for large images.
+
+### 🛡️ Security & Integrity
+- Authentication of encrypted data.
+- Detection of modified, corrupted, or truncated files.
+- Protection against chunk reordering and duplication.
+- Secure temporary-file handling.
+- Password and key information never stored in history or logs.
+
+### 🖼️ Image Processing
+- Supports PNG, JPG, JPEG, BMP, and TIFF.
+- Exact byte-for-byte image restoration.
+- Preserves original metadata and image properties.
+- Preview images before encryption and after decryption.
+
+### 🖥️ User Interface
+- Modern PySide6 graphical interface.
+- Dark and light themes.
+- Drag-and-drop image selection.
+- Password strength indicator and generator.
+- Encryption progress with cancellation.
+- File history with search, filtering, and CSV export.
+
+### ⚙️ Additional Features
+- Configurable encryption strength.
+- Security Center with live self-test.
+- Custom export directory.
+- Application settings and restore defaults.
+- Keyboard shortcuts for navigation.
 
 ---
 
-## 1. Installation (Windows 10/11)
+## 🛠️ Technology Stack
 
-1. Install **Python 3.11 or newer** from <https://www.python.org/downloads/> and tick
-   **"Add python.exe to PATH"** in the installer.
-2. Open *PowerShell* in the project folder and run:
+| Technology | Purpose |
+|---|---|
+| Python 3.11+ | Core application development |
+| PySide6 | Desktop graphical interface |
+| Cryptography | AES-256-GCM encryption |
+| Argon2-cffi | Argon2id key derivation |
+| PBKDF2-HMAC-SHA256 | Alternative key derivation |
+| SQLite | Local application history |
+| Pytest | Automated testing |
+
+---
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+
+- Windows 10/11, macOS, or Linux
+- Python 3.11 or newer
+- Git
+
+### 1. Clone the repository
+
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd CipherPixel
+```
+
+### 2. Create a virtual environment
+
+**Windows (PowerShell):**
 
 ```powershell
-py -3.11 -m venv .venv          # or: py -m venv .venv
+py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+```
+
+**macOS / Linux:**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+### 4. Run the application
+
+```bash
 python main.py
 ```
 
-If PowerShell refuses to run the activation script:
-`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, or use `.\.venv\Scripts\activate.bat` in *cmd*.
-
-**macOS / Linux:** `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python main.py`
-(Linux may additionally need `libxcb-cursor0`, see Troubleshooting.)
-
-### Run the tests
-
-```powershell
-pip install -r requirements-dev.txt
-python -m pytest                 # full suite (crypto + security + GUI)
-python -m pytest tests/test_encryption.py tests/test_decryption.py tests/test_security.py   # no GUI needed
-```
-
-GUI tests run headless; on Windows set nothing, on Linux CI use `QT_QPA_PLATFORM=offscreen`.
+The CipherPixel desktop application will launch.
 
 ---
 
-## 2. Using the app
+## 🔑 How to Use
 
-| Page | What it does |
+### 1. Encrypt an Image
+
+1. Open the **Encrypt Image** page.
+2. Select an image using drag-and-drop or file browsing.
+3. Preview the selected image and its properties.
+4. Enter a strong password or generate one.
+5. Choose the desired encryption configuration.
+6. Click **ENCRYPT IMAGE**.
+7. Wait for encryption to complete.
+8. Save the generated `.cpx` file.
+
+### 2. Decrypt an Image
+
+1. Open the **Decrypt Image** page.
+2. Select the encrypted `.cpx` file.
+3. Enter the original encryption password.
+4. Click **DECRYPT IMAGE**.
+5. Verify the restored image preview.
+6. Export the decrypted image.
+
+> ⚠️ **Important:** Passwords cannot be recovered. Always remember your encryption password. Encryption does not automatically delete the original image.
+
+---
+
+## 🧠 Encryption Architecture
+
+CipherPixel uses authenticated encryption with password-based key derivation.
+
+### Encryption Workflow
+
+```text
+       User Password
+             |
+          NFKC
+             |
+             v
+      Key Derivation
+      (Argon2id / PBKDF2)
+             |
+             v
+       256-bit Key
+             |
+             v
+      AES-256-GCM
+             |
+             v
+    Chunk-based Encryption
+             |
+             v
+       Authenticated
+         .cpx File
+```
+
+### `.cpx` File Format – Version 1
+
+| Component | Description |
 |---|---|
-| **Overview** | Totals, quick actions, recent activity. |
-| **Encrypt Image** | Drag-drop or browse (PNG/JPG/JPEG/BMP/TIFF) → preview and facts → password (strength meter, show/hide, generator, copy) → KDF settings → **ENCRYPT IMAGE** → progress (cancellable) → **Save Encrypted File**. |
-| **Decrypt Image** | Drag-drop or browse a `.cpx` → password → **DECRYPT IMAGE** → preview, original size/format → **Export Image**. |
-| **File History** | Search, filter (encrypt/decrypt), sort, delete selected, clear, export CSV. |
-| **Security Center** | Active configuration, a **live self-test** of the real engine, and plain-language explanations. |
-| **Settings** | Export folder, theme, password visibility, clipboard clearing, default KDF, history recording, restore defaults. |
+| Header | 48-byte plaintext authenticated header |
+| Metadata | Encrypted JSON containing filename, format, size, dimensions, and SHA-256 |
+| Data Chunks | Encrypted image data in chunks of up to 1 MiB |
+| Final Chunk | Authenticated final chunk for truncation detection |
 
-Shortcuts: `Ctrl+1` … `Ctrl+7` switch pages. The top-bar pill shows the result of the start-up self-test.
+### Security Mechanisms
 
-**Important:** passwords cannot be recovered. Encrypting does **not** delete your original image.
+- **AES-256-GCM:** Provides authenticated encryption.
+- **Argon2id:** Memory-hard password-based key derivation.
+- **PBKDF2-HMAC-SHA256:** Alternative key derivation mechanism.
+- **Random Salt:** Fresh 128-bit salt for each encrypted file.
+- **Nonce Management:** 96-bit nonces constructed from a random 64-bit prefix and a 32-bit counter.
+- **Authenticated Additional Data (AAD):** Protects header information, chunk types, and ordering.
+- **SHA-256:** Verifies restored image integrity.
+- **Atomic Decryption:** Output is committed only after successful authentication and verification.
 
 ---
 
-## 3. Encryption architecture
+## ⚙️ Key Derivation Presets
 
-```
-password ──NFKC──► KDF(salt, params) ──► 256-bit key ─┐
-                                                       ├─► AES-256-GCM, one call per 1 MiB chunk
-random salt (128-bit) + random nonce prefix (64-bit) ──┘
-```
+CipherPixel provides three configurable security levels.
 
-### `.cpx` format v1 (`core/cpx_format.py`)
-
-```
-HEADER (48 B, plaintext, authenticated)   magic "CPXF" | version | kdf id | flags=0
-                                          kdf p1,p2,p3 | chunk size | salt[16] | nonce prefix[8]
-META   chunk : u32 length | AES-GCM( JSON: file name, format, size, dimensions, SHA-256 ) | 16-B tag
-DATA   chunk : u32 length | AES-GCM( ≤ 1 MiB of image bytes ) | 16-B tag        (repeated)
-FINAL  chunk : u32 length | AES-GCM( last bytes )               | 16-B tag
-```
-
-* **Real, standard primitives only.** AES-256-GCM from the `cryptography` library; Argon2id
-  (`argon2-cffi`) or PBKDF2-HMAC-SHA256. Nothing custom, no XOR/pixel tricks.
-* **Whole file is encrypted**, not decoded pixels – so JPEG compression, EXIF and ICC profiles are restored exactly.
-* **Nonce uniqueness.** Key = KDF(password, *fresh random salt*) → unique per file. Per-chunk 96-bit
-  nonce = *8 random bytes ‖ 32-bit counter*, so no (key, nonce) pair is ever reused. Counter overflow is refused.
-* **Streaming & ordering.** Each chunk's AAD = *entire header ‖ chunk type ‖ chunk index*. Changing any
-  header byte, reordering, duplicating, splicing from another file, removing or appending a chunk makes a tag fail.
-  The last chunk is typed `FINAL`, so **truncation is detected** even at an exact chunk boundary.
-  Memory use is bounded (~2 chunks) so very large images do not exhaust RAM.
-* **Fail closed.** Decryption writes to a temp file and moves it into place only after every tag, the size and the
-  SHA-256 verify. A wrong password or damaged file never produces an output file.
-* **Parameter bounds.** KDF memory/time/lanes and chunk size read from a header are range-checked *before* any
-  expensive work, so a hostile file can't demand gigabytes of RAM.
-* **No oracle.** Wrong password and tampered header give the same message. Errors never include key material.
-* **Privacy.** Logs hold operation names, exception class names and redacted paths only. History stores file name,
-  type, size, time and status only; passwords/keys/pixels are never persisted. CSV export neutralises formula injection.
-
-### KDF presets (Settings → Default encryption configuration)
-
-| Level | Argon2id | PBKDF2-HMAC-SHA256 |
+| Security Level | Argon2id | PBKDF2-HMAC-SHA256 |
 |---|---|---|
-| Balanced (default) | 64 MiB · 3 passes · 4 lanes | 600,000 iterations |
-| Strong | 256 MiB · 4 passes · 4 lanes | 1,200,000 |
-| Maximum | 512 MiB · 5 passes · 4 lanes | 3,000,000 |
+| Balanced (Default) | 64 MiB · 3 passes · 4 lanes | 600,000 iterations |
+| Strong | 256 MiB · 4 passes · 4 lanes | 1,200,000 iterations |
+| Maximum | 512 MiB · 5 passes · 4 lanes | 3,000,000 iterations |
 
-Balanced meets/exceeds current OWASP minimums. Parameters are stored in each file, so changing the default never breaks old files.
+The selected parameters are stored inside each encrypted file, ensuring previously encrypted files remain compatible even when default settings change.
 
 ---
 
-## 4. Project layout
+## 📂 Project Structure
 
+```text
+CipherPixel/
+│
+├── main.py
+│
+├── core/
+│   ├── encryption.py
+│   ├── decryption.py
+│   ├── cpx_format.py
+│   ├── key_manager.py
+│   ├── file_handler.py
+│   ├── security_utils.py
+│   ├── history.py
+│   ├── selftest.py
+│   └── errors.py
+│
+├── ui/
+│   ├── components/
+│   ├── theme.py
+│   ├── workers.py
+│   └── application pages
+│
+├── utils/
+│   ├── settings
+│   ├── logger
+│   ├── paths
+│   └── validators
+│
+├── tests/
+│
+├── assets/
+│   └── fonts/
+│
+├── docs/
+│   └── screenshots/
+│
+├── tools/
+│   └── make_screenshots.py
+│
+├── requirements.txt
+├── requirements-dev.txt
+└── README.md
 ```
-main.py                    entry point
-core/                      GUI-independent engine (fully unit-tested)
-  encryption.py decryption.py   streaming encrypt / authenticated decrypt
-  cpx_format.py                 header + chunk sealing
-  key_manager.py                Argon2id / PBKDF2, presets, bounds
-  file_handler.py               image validation, atomic writes, free-space checks, temp dir
-  security_utils.py             strength meter, password generator, filename sanitising
-  history.py  selftest.py  errors.py
-ui/                        PySide6 interface (shell, 7 pages, components/, theme.py, workers.py)
-utils/                     settings, logger, paths, validators
-tests/                     pytest suite   tools/make_screenshots.py   docs/screenshots/
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+CipherPixel includes **176 automated tests** covering encryption, decryption, security, and GUI functionality.
+
+### Test Coverage
+
+- Exact byte-for-byte image restoration.
+- PNG, JPG, JPEG, BMP, and TIFF support.
+- Incorrect password handling.
+- Tampered header and encrypted data detection.
+- Chunk modification, duplication, reordering, and removal.
+- File truncation and corruption detection.
+- Nonce and salt uniqueness.
+- Invalid encryption parameters.
+- Unsupported and disguised image files.
+- Cancellation and temporary-file handling.
+- History privacy and SQL/LIKE safety.
+- Settings validation.
+- End-to-end GUI tests using real buttons and worker threads.
+
+### Run Tests
+
+Install development dependencies:
+
+```bash
+pip install -r requirements-dev.txt
 ```
 
-Background work uses `QThread` workers with throttled progress and cooperative cancellation; the UI thread never blocks.
-The theme system (`ui/theme.py`) is a small built-in QSS generator with dark and light palettes, used instead of `qdarktheme`
-to keep the look fully consistent and dependency-light. Inter is bundled in `assets/fonts` (SIL OFL).
+Run the complete test suite:
+
+```bash
+python -m pytest
+```
+
+Run core encryption and security tests without GUI tests:
+
+```bash
+python -m pytest tests/test_encryption.py tests/test_decryption.py tests/test_security.py
+```
 
 ---
 
-## 5. Tests
+## ⚠️ Limitations & Security Considerations
 
-176 automated tests, including (spec items in brackets):
-round-trip of PNG/JPG/JPEG/BMP/TIFF with exact byte equality [1-3]; wrong passwords [4]; a bit-flip in every region of the file,
-every chunk, header and tag, truncation at every boundary, appended/duplicated/reordered/removed/spliced chunks [5-6];
-unsupported, disguised and truncated images [7]; empty files [8]; a ~13 MB multi-chunk image [9]; unique nonces and salts [10-11];
-bad magic/version/flags/KDF/chunk-size headers and absurd length fields [12]; cancel leaves no files; history privacy and
-SQL/LIKE safety; settings validation; and 24 end-to-end GUI tests that click the real buttons and run real worker threads.
-Mutating the code (constant salt, nonce reuse, dropped AAD, no FINAL flag) makes the suite fail, confirming the tests bite.
+- The application has not undergone an independent security audit.
+- Python cannot reliably zero password strings from memory.
+- Temporary files are deleted on application exit, but deletion is not guaranteed secure erasure on SSDs.
+- Use full-disk encryption such as BitLocker or FileVault for additional protection.
+- Password strength estimation is heuristic-based.
+- Original images are not automatically deleted after encryption.
+- GIF, WebP, and animated image formats are not supported.
+- High-security Argon2id settings require additional memory.
 
----
-
-## 6. Limitations (please read)
-
-* **Not independently audited.** It uses well-reviewed primitives, but the file format and application are new code.
-* **Passwords:** Python cannot reliably zero strings in memory. The UI clears fields after use, but a memory dump of a running process could expose them.
-* **Temporary files:** the encrypted/decrypted result waits in a private temp folder until you save or quit, then is deleted. Deleting is not secure erasure on SSDs;
-  use full-disk encryption (BitLocker/FileVault) for protection against forensic recovery.
-* Strength estimation is a heuristic, not a guarantee. Use the generator or a long passphrase.
-* Your original image is left untouched – delete it yourself after verifying the `.cpx`.
-* GIF/WebP and animated formats are intentionally not supported.
-* Screenshots were rendered headlessly on Linux; layout on Windows uses the same Qt code, but fonts/DPI scaling may differ slightly.
+**Security Recommendation:** Use a long, unique passphrase or the built-in password generator. Keep backups of encrypted files and their passwords.
 
 ---
 
-## 7. Troubleshooting
+## 🔧 Troubleshooting
 
-| Problem | Fix |
+| Issue | Solution |
 |---|---|
-| `python` not recognised | Reinstall Python with *Add to PATH*, or use `py -3.11`. |
-| `ModuleNotFoundError: PySide6` / other import errors | Activate the venv, then `pip install -r requirements.txt`. |
-| Pip fails building a package | Upgrade pip (`python -m pip install --upgrade pip`) and use 64-bit Python 3.11–3.13. |
-| Argon2id unavailable notice | `pip install argon2-cffi` (the app falls back to PBKDF2 until then). |
-| Linux: *"Could not load the Qt platform plugin xcb"* | `sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libegl1` |
-| "Decryption failed. The password is incorrect, or the file has been modified." | Check the password (case, keyboard layout, trailing spaces; use *show password*). If it is correct, the file was altered – restore from a backup. |
-| "Integrity check failed…" | The file is corrupted or truncated (partial download/copy). Re-copy it from the source. |
-| "Not enough memory…" | Choose a lower security level; *Maximum* Argon2id needs ~0.5 GB RAM. Files already encrypted at that level need the same memory to open. |
-| "Not enough free disk space" | Free space on the destination drive (output ≈ size of the image). |
-| Blurry/small UI on a high-DPI display | Qt scales automatically; set Windows *Display scaling* to a standard value (100–200 %). |
-| Something odd | Look at `data/logs/cipherpixel.log` (no passwords or image data are ever logged). Data falls back to `%APPDATA%\CipherPixel` if the project folder isn't writable. |
+| Python not recognized | Install Python and enable Add Python to PATH. |
+| PySide6 module not found | Activate the virtual environment and install requirements. |
+| Package installation fails | Upgrade pip and use 64-bit Python 3.11–3.13. |
+| Argon2id unavailable | Install `argon2-cffi`. |
+| Qt platform plugin error on Linux | Install `libxcb-cursor0`, `libxkbcommon-x11-0`, and `libegl1`. |
+| Decryption failed | Verify your password and check whether the encrypted file was modified. |
+| Integrity check failed | The encrypted file may be corrupted or truncated. |
+| Insufficient memory | Select a lower encryption security level. |
+| Insufficient disk space | Free up space on the destination drive. |
 
-Regenerate screenshots: `python tools/make_screenshots.py`
-#   c i p h e r p i x e l 
- 
- #   c i p h e r p i x e l  
- 
- 
+Application logs are available at:
+
+```text
+data/logs/cipherpixel.log
+```
+
+Logs do not contain passwords or image data.
+
+To regenerate application screenshots:
+
+```bash
+python tools/make_screenshots.py
+```
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl + 1` to `Ctrl + 7` | Switch between application pages |
+
+---
+
+## 🔒 Privacy
+
+CipherPixel is designed for completely local operation.
+
+- No cloud uploads.
+- No external network communication.
+- No password or encryption-key persistence.
+- No image data stored in application history.
+- Local processing and file management.
+
+Your images remain on your device.
+
+---
+
+## 👨‍💻 Developer
+
+**Developed as a desktop application project focused on image security, cryptography, and data integrity.**
+
+---
+
+## 📜 License
+
+Add your preferred open-source license here. If you intend to distribute this project, include the corresponding `LICENSE` file.
+
+---
+
+⭐ **If you find CipherPixel useful, consider giving the repository a star!**
