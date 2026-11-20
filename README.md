@@ -175,6 +175,8 @@ Mutating the code (constant salt, nonce reuse, dropped AAD, no FINAL flag) makes
 | Something odd | Look at `data/logs/cipherpixel.log` (no passwords or image data are ever logged). Data falls back to `%APPDATA%\CipherPixel` if the project folder isn't writable. |
 
 Regenerate screenshots: `python tools/make_screenshots.py`
-#   c i p h e r p i x e l  
- #   c i p h e r p i x e l  
+#   c i p h e r p i x e l 
+ 
+ #   c i p h e r p i x e l  
+ 
  
